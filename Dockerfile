@@ -72,37 +72,27 @@ RUN pip3 install Twisted wifi CT3 pillow treq future netifaces cffi puremagic tm
 
 RUN update-alternatives --install /usr/bin/cpp cpp /usr/bin/cpp-14 1
 
-# Build and install libdvbsi++
-RUN cd /tmp && \
-    git clone --depth 1 https://github.com/oe-alliance/libdvbsi.git && \
-    cd libdvbsi && \
-    autoreconf -i && \
-    ./configure && \
-    make && \
-    make install
+WORKDIR /work
 
-# Build and install libsigc++-3
-RUN cd /tmp && \
-    git clone --depth 1 https://github.com/TwolDE2/libsigc--3.0.git && \
-    cd libsigc--3.0 && \
-    autoreconf -i && \
-    ./configure && \
-    make && \
-    make install
+RUN git clone --depth 1 https://github.com/oe-alliance/libdvbsi.git
+RUN cd libdvbsi \
+  && ./autogen.sh \
+  && ./configure --prefix=/usr \
+  && make \
+  && make install
 
-# Build and install tuxbox
-RUN cd /tmp && \
-    git clone --depth 1 https://github.com/oe-alliance/tuxtxt.git && \
-    cd tuxtxt/libtuxtxt && \
-    autoreconf -i && \
-    ./configure --with-boxtype=generic DVB_API_VERSION=5 && \
-    make && \
-    make install && \
-    cd ../tuxtxt && \
-    autoreconf -i && \
-    ./configure --with-boxtype=generic DVB_API_VERSION=5 && \
-    make && \
-    make install
+RUN git clone --depth 1 https://github.com/oe-alliance/tuxtxt.git
+RUN cd tuxtxt/libtuxtxt \
+  && autoreconf -i \
+  && CPP="gcc -E -P" ./configure --with-boxtype=generic --prefix=/usr \
+  && make \
+  && make install
+
+RUN cd tuxtxt/tuxtxt \
+  && autoreconf -i \
+  && CPP="gcc -E -P" ./configure --with-boxtype=generic --prefix=/usr \
+  && make \
+  && make install
 
 ARG OPKG_VER="0.7.0"
 RUN curl -L https://git.yoctoproject.org/opkg/snapshot/opkg-$OPKG_VER.tar.gz -o opkg.tar.gz
@@ -113,7 +103,8 @@ RUN cd "opkg-$OPKG_VER" \
   && make \
   && make install
 
-RUN git clone --depth 1 https://github.com/openatv/enigma2.git -b master
+
+RUN git clone --depth 1 https://github.com/openatv/enigma2.git
 COPY ax_python_devel.m4 /work/enigma2/m4/ax_python_devel.m4
 RUN cd enigma2 \
   && ./autogen.sh \
@@ -130,13 +121,15 @@ RUN cd branding-module \
   && ./configure --prefix=/usr --with-imageversion="7.4" \
   && make \
   && make install
+
     
 #default skin
-RUN git clone --depth 1 https://github.com/openatv/oe-alliance-e2-skindefault.git -b V2
+RUN git clone --depth 1 https://github.com/openatv/oe-alliance-e2-skindefault.git
 RUN cd oe-alliance-e2-skindefault \
-  && cp -arv fonts /usr/share/ \
-  && cp -arv skin_default /usr/share/enigma2/ \
-  && cp prev.png /usr/share/enigma2/
+ && cp -arv fonts /usr/share/ \
+ && cp -arv skin_default /usr/share/enigma2/ \
+ && cp skin*.xml /usr/share/enigma2/ \
+ && cp prev.png /usr/share/enigma2/
 
 #metrix
 RUN git clone --depth 1 https://github.com/openatv/MetrixHD.git -b master
