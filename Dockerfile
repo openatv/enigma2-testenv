@@ -135,6 +135,27 @@ RUN cd oe-alliance-e2-skindefault \
 RUN git clone --depth 1 https://github.com/openatv/MetrixHD.git -b master
 RUN cd MetrixHD && cp -arv usr /
 
+# OPKG
+RUN mkdir -p /etc/opkg && mkdir -p /var/lib/opkg/lists && mkdir -p /var/lib/opkg/info \
+  && echo "dest root /" > /etc/opkg/opkg.conf \
+  && echo "option lists_dir /var/lib/opkg/lists" >> /etc/opkg/opkg.conf \
+  && echo "option status_file /var/lib/opkg/status" >> /etc/opkg/opkg.conf \
+  && echo "arch all 1" > /etc/opkg/arch.conf \
+  && echo "arch any 6" >> /etc/opkg/arch.conf \
+  && echo "arch noarch 11" >> /etc/opkg/arch.conf \
+  && echo "src/gz openatv-all http://feeds2.mynonpublic.com/7.4/vusolo4k/all" >> /etc/opkg/all-feed.conf \
+  && echo "src/gz oe-alliance-settings-feed https://raw.githubusercontent.com/oe-alliance/oe-alliance-settings-feed/master/feed" >> /etc/opkg/oe-alliance-settings-feed.conf
 
+COPY opkg.py /work/opkg.py
+RUN python opkg.py
+
+RUN if [ -f /usr/lib32/libc.so.6 ]; then ln -snf /usr/lib32/libc.so.6 /usr/lib/libc.so.6 && chmod 755 /usr/lib32/libc.so.6; fi
+RUN if [ -f /usr/lib/aarch64-linux-gnu/libc.so.6 ]; then ln -snf /usr/lib/aarch64-linux-gnu/libc.so.6 /usr/lib/libc.so.6 && chmod 755 /usr/lib/aarch64-linux-gnu/libc.so.6; fi
+
+
+RUN mkdir -p /media/hdd/movie && mkdir -p /media/hdd/picon && mkdir -p /hdd && mkdir -p /etc/enigma2
+COPY enigma.info /usr/lib/enigma.info
+COPY process.py /usr/lib/python3.14/process.py
+COPY etc/* /etc/enigma2/
 WORKDIR /src
 CMD ["/bin/bash"]

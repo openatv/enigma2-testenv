@@ -1,0 +1,13 @@
+config.usage.numberMode=2
+config.misc.firstrun=False
+config.epg.maxdays=100
+config.epg.histminutes=1440
+#config.crash.debugEPG=True
+config.usage.correct_invalid_epgdata=2
+config.misc.videowizardenabled=False
+config.misc.initialchannelselection=False
+config.misc.do_overscanwizard=False
+config.skin.primary_skin=MetrixHD/skin.xml
+config.av.videomode.HDMI=1080p
+config.av.videorate.1080p=auto
+config.tv.lastroot=1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "bouquets.tv" ORDER BY bouquet;1:7:1:0:0:0:0:0:0:0:FROM BOUQUET "userbouquet.favourites.tv" ORDER BY bouquet;
