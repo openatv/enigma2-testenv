@@ -20,50 +20,56 @@
 
 FROM ubuntu:24.04
 
-RUN apt-get update && \
-    apt-get install -y software-properties-common && \
-    for i in 1 2 3 4 5; do \
-      add-apt-repository -y ppa:deadsnakes/ppa && break || sleep 10; \
-    done && \
-    apt-get remove -y libunwind-14-dev || true && \
-    apt-get install -y \
-        g++-14 \
-        gcc-14 \
-        linux-libc-dev \
-        git \
-        build-essential \
-        automake \
-        autoconf \
-        libtool \
-        python3.13 \
-        python3.13-dev \
-        zlib1g-dev \
-        gettext \
-        swig \
-        libgstreamer1.0-dev \
-        libgstreamer-plugins-base1.0-dev \
-        libfreetype6-dev \
-        libfribidi-dev \
-        libavahi-client-dev \
-        libjpeg-turbo8-dev \
-        libgif-dev \
-        libpng-dev \
-        libwebp-dev \
-        libxml2-dev \
-        libssl-dev \
-        libcrypto++-dev \
-        libcurl4-openssl-dev \
-        libsqlite3-dev \
-        mm-common \
-        pkg-config \
-        wget \
-        curl \
-        unzip \
-        ca-certificates
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Berlin
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# Keys
+RUN apt-get update -o Acquire::AllowInsecureRepositories=true \
+    && apt-get install -y --no-install-recommends ubuntu-keyring \
+    && apt-get update \
+    && apt-get upgrade -y
 
-# Set gcc-14 and g++-14 as default
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100 && \
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
+RUN apt install -y tzdata
+
+RUN apt-get update && apt-get install -y software-properties-common
+RUN add-apt-repository ppa:deadsnakes/ppa -y \
+    && apt-get update \
+    && apt-get install -y python3.14-dev
+
+RUN apt-get update && apt-get install -y \
+  git g++-14 build-essential autoconf autotools-dev gettext libtool libtool-bin unzip swig \
+  python3-usb python3-requests \
+  libz-dev libssl-dev \
+  libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libsigc++-3.0-dev \
+  libfreetype6-dev libfribidi-dev \
+  libavahi-client-dev libjpeg-dev libgif-dev libsdl2-dev libxml2-dev libwebp-dev libswscale-dev libavutil-dev \
+  libarchive-dev libcurl4-openssl-dev libgpgme11-dev libtirpc-dev \
+  x11vnc xvfb xdotool nginx openssh-server curl vsftpd nano locales iputils-ping net-tools gdb valgrind libsqlite3-dev libuchardet-dev
+
+
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen \
+    && locale-gen en_US.UTF-8
+
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+ENV PYTHONUTF8=1
+
+
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.14 1
+RUN rm /usr/bin/python3 && ln -sf /usr/bin/python3.14 /usr/bin/python3
+RUN rm /usr/bin/pygettext3 && ln -sf /usr/bin/pygettext3.14 /usr/bin/pygettext3
+RUN rm /usr/bin/pydoc3 && ln -sf /usr/bin/pydoc3.14 /usr/bin/pydoc3
+
+RUN apt-get install -y python3-pip
+
+RUN pip install --upgrade --force-reinstall setuptools
+
+RUN pip3 install Twisted wifi CT3 pillow treq future netifaces cffi puremagic tmdbsimple tvdbsimple tinytag mutagen --break-system-packages
+
+RUN update-alternatives --install /usr/bin/cpp cpp /usr/bin/cpp-14 1
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100
+RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
 
 # Build and install libdvbsi++
 RUN cd /tmp && \
@@ -115,7 +121,6 @@ RUN cd enigma2 \
   && make install
 RUN ldconfig
 
-
 #branding
 RUN git clone --depth 1 https://github.com/oe-mirrors/branding-module.git
 COPY ax_python_devel.m4 branding-module/m4/ax_python_devel.m4
@@ -131,7 +136,6 @@ RUN cd oe-alliance-e2-skindefault \
   && cp -arv fonts /usr/share/ \
   && cp -arv skin_default /usr/share/enigma2/ \
   && cp prev.png /usr/share/enigma2/
-
 
 #metrix
 RUN git clone --depth 1 https://github.com/openatv/MetrixHD.git -b master
