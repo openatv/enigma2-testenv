@@ -56,6 +56,9 @@ ENV LC_ALL=en_US.UTF-8
 ENV PYTHONUTF8=1
 
 
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 1
+RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 1
+
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.14 1
 RUN rm /usr/bin/python3 && ln -sf /usr/bin/python3.14 /usr/bin/python3
 RUN rm /usr/bin/pygettext3 && ln -sf /usr/bin/pygettext3.14 /usr/bin/pygettext3
@@ -68,8 +71,6 @@ RUN pip install --upgrade --force-reinstall setuptools
 RUN pip3 install Twisted wifi CT3 pillow treq future netifaces cffi puremagic tmdbsimple tvdbsimple tinytag mutagen --break-system-packages
 
 RUN update-alternatives --install /usr/bin/cpp cpp /usr/bin/cpp-14 1
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100
-RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
 
 # Build and install libdvbsi++
 RUN cd /tmp && \
