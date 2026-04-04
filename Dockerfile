@@ -131,6 +131,10 @@ RUN cd oe-alliance-e2-skindefault \
  && cp skin*.xml /usr/share/enigma2/ \
  && cp prev.png /usr/share/enigma2/
 
+#WeatherInfo
+RUN git clone --depth 1 https://github.com/openatv/WeatherInfo.git
+RUN cd WeatherInfo && cp Weatherinfo.py /usr/lib/enigma2/python/Tools/
+
 #metrix
 RUN git clone --depth 1 https://github.com/openatv/MetrixHD.git -b master
 RUN cd MetrixHD && cp -arv usr /
@@ -153,7 +157,7 @@ RUN if [ -f /usr/lib32/libc.so.6 ]; then ln -snf /usr/lib32/libc.so.6 /usr/lib/l
 RUN if [ -f /usr/lib/aarch64-linux-gnu/libc.so.6 ]; then ln -snf /usr/lib/aarch64-linux-gnu/libc.so.6 /usr/lib/libc.so.6 && chmod 755 /usr/lib/aarch64-linux-gnu/libc.so.6; fi
 
 
-RUN mkdir -p /media/hdd/movie && mkdir -p /media/hdd/picon && mkdir -p /hdd && mkdir -p /etc/enigma2
+RUN mkdir -p /media/hdd/movie && mkdir -p /media/hdd/picon && mkdir -p /hdd && mkdir -p /etc/enigma2 && mkdir -p /etc/tuxtxt && mkdir -p /dev/input
 COPY enigma.info /usr/lib/enigma.info
 COPY process.py /usr/lib/python3.14/process.py
 COPY etc/* /etc/enigma2/
