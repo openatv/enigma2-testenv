@@ -68,7 +68,7 @@ RUN apt-get install -y python3-pip
 
 RUN pip install --upgrade --force-reinstall setuptools
 
-RUN pip3 install Twisted wifi CT3 pillow treq future netifaces cffi puremagic tmdbsimple tvdbsimple tinytag mutagen --break-system-packages
+RUN pip3 install Twisted wifi CT3 pillow treq future netifaces cffi puremagic tmdbsimple tvdbsimple tinytag mutagen python-dateutil lxml --break-system-packages
 
 RUN update-alternatives --install /usr/bin/cpp cpp /usr/bin/cpp-14 1
 
