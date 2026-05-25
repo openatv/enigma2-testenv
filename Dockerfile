@@ -68,7 +68,7 @@ RUN apt-get install -y python3-pip
 
 RUN pip install --upgrade --force-reinstall setuptools
 
-RUN pip3 install Twisted wifi CT3 pillow treq future netifaces cffi puremagic tmdbsimple tvdbsimple tinytag mutagen python-dateutil lxml --break-system-packages
+RUN pip3 install Twisted wifi CT3 pillow treq future netifaces cffi puremagic tmdbsimple tvdbsimple tinytag mutagen python-dateutil lxml python3-backports-lzma --break-system-packages
 
 RUN update-alternatives --install /usr/bin/cpp cpp /usr/bin/cpp-14 1
 
@@ -95,7 +95,7 @@ RUN cd tuxtxt/tuxtxt \
   && make install
 
 ARG OPKG_VER="0.7.0"
-RUN curl -L https://git.yoctoproject.org/opkg/snapshot/opkg-$OPKG_VER.tar.gz -o opkg.tar.gz
+RUN curl -L https://downloads.yoctoproject.org/releases/opkg/opkg-$OPKG_VER.tar.gz -o opkg.tar.gz
 RUN tar -xzf opkg.tar.gz
 RUN cd "opkg-$OPKG_VER" \
   && autoreconf -i \
