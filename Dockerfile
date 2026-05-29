@@ -56,9 +56,8 @@ ENV LC_ALL=en_US.UTF-8
 ENV PYTHONUTF8=1
 
 # compilers
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 1
-RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 1
-RUN update-alternatives --install /usr/bin/cpp cpp /usr/bin/cpp-14 1
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100 \
+ && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
 
 # python 3.14 system binding
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.14 1
