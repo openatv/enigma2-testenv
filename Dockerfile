@@ -68,7 +68,7 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 ENV PIP_NO_CACHE_DIR=1
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
 
-RUN pip3 install --upgrade setuptools wheel
+RUN pip3 install --upgrade setuptools
 
 # IMPORTANT FIX:
 # prevent cryptography uninstall attempts caused by dependency resolution
