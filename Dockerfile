@@ -34,7 +34,7 @@ RUN apt install -y tzdata
 RUN apt-get update && apt-get install -y software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa -y \
     && apt-get update \
-    && apt-get install -y python3.14-dev
+    && apt-get install -y python3.14-dev python3.14-venv python3-pip
 
 RUN apt-get update && apt-get install -y \
   git g++-14 build-essential autoconf autotools-dev gettext libtool libtool-bin unzip swig \
@@ -55,22 +55,32 @@ ENV LANGUAGE=en_US:en
 ENV LC_ALL=en_US.UTF-8
 ENV PYTHONUTF8=1
 
-
+# compilers
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 1
 RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 1
-
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.14 1
-RUN rm /usr/bin/python3 && ln -sf /usr/bin/python3.14 /usr/bin/python3
-RUN rm /usr/bin/pygettext3 && ln -sf /usr/bin/pygettext3.14 /usr/bin/pygettext3
-RUN rm /usr/bin/pydoc3 && ln -sf /usr/bin/pydoc3.14 /usr/bin/pydoc3
-
-RUN apt-get install -y python3-pip
-
-RUN pip install --upgrade --force-reinstall setuptools
-
-RUN pip3 install Twisted wifi CT3 pillow treq future netifaces cffi puremagic tmdbsimple tvdbsimple tinytag mutagen python-dateutil lxml --break-system-packages
-
 RUN update-alternatives --install /usr/bin/cpp cpp /usr/bin/cpp-14 1
+
+# python 3.14 system binding
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.14 1
+RUN ln -sf /usr/bin/python3.14 /usr/bin/python3
+
+# pip safety config (CRITICAL FIX)
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+ENV PIP_NO_CACHE_DIR=1
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
+
+RUN pip3 install --upgrade setuptools wheel
+
+# IMPORTANT FIX:
+# prevent cryptography uninstall attempts caused by dependency resolution
+RUN pip3 install \
+    --no-deps cryptography || true
+
+# now install packages safely (no uninstall attempts)
+RUN pip3 install \
+    Twisted wifi CT3 pillow treq future netifaces cffi puremagic \
+    tmdbsimple tvdbsimple tinytag mutagen python-dateutil lxml \
+    --break-system-packages
 
 WORKDIR /work
 
